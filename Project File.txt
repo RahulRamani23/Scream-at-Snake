@@ -17,10 +17,10 @@ UofT E-mail Address: prashyen.kanagarajah@mail.utoronto.ca
 
 Team Member C (Optional)
 -------------
-First Name: 
-Last Name:
-Student Number:
-UofT E-mail Address:
+First Name: Justin
+Last Name: Lyn
+Student Number: 1004178301
+UofT E-mail Address: Justin.lyn@mail.utoronto.ca
 
 Team Member D (Optional)
 -------------
