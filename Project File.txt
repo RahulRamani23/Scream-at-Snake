@@ -24,10 +24,10 @@ UofT E-mail Address: Justin.lyn@mail.utoronto.ca
 
 Team Member D (Optional)
 -------------
-First Name: 
-Last Name:
-Student Number:
-UofT E-mail Address:
+First Name: Aamir
+Last Name: Haroon
+Student Number: 1004360648
+UofT E-mail Address: aamir.haroon@mail.utoronto.ca
 
 
 Project Plan
