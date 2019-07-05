@@ -10,10 +10,10 @@ UofT E-mail Address: rahul.ramani@mail.utoronto.ca
 
 Team Member B
 -------------
-First Name: 
-Last Name:
-Student Number:
-UofT E-mail Address:
+First Name: Prashyen
+Last Name: Kanagarajah
+Student Number: 1004107637
+UofT E-mail Address: prashyen.kanagarajah@mail.utoronto.ca
 
 Team Member C (Optional)
 -------------
@@ -39,7 +39,7 @@ Project Title: Scream at Snake
 Provide a one paragraph description of your project:
 We are creating a modified version of the classic video game snake. This video game will have three modes. We will have a classic mode
 which exists mainly for testing purposes, a two player mode where each player tries to grow their snake and take the other out, lastly
-lastly we will have the name of the game scream at snake which is a mode in which you control the snake by making loud noises into a
+we will have the name of the game scream at snake which is a mode in which you control the snake by making loud noises into a
 microphone.
 
 What is your plan for the first week?
