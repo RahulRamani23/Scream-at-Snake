@@ -66,11 +66,13 @@ Weekly Reports
 <In this space, provide a report each week of what worked and what didn't, and what (if any) changes were made to your proposal)>
 
 
-[This is an example of a report where things didn't go so well.]
+
 Week 1: 
-	We added and tested the sensors and the main FSM. 
-	The distance sensor we had intended to use didn't work as expected (wasn't precise enough at further distances, only seems to work accurately within 5-10cm), so instead we've decided to change the project to use a light sensor instead.
-	Had trouble getting the FSM to work (kept getting stuck in state 101, took longer to debug than expected), so we may not be able to add the high score feature. We have updated that in the project description as an optional feature.
+	We did reseach involving the idea for our project. The main goal of the first week was to determine what modules we would require and old repositories we would be able to use.
+	We disovered an existing repository that consisted of a completed snake game. Seeing this we modified the idea for our project a little. We were going to use large parts of the
+	existing code and build on top of that to create new game modes. We came up with various new additions, including Scream at snake, battle mode, race mode and different difficulty
+	settings. We planned out exactly how we plan on executing this idea and determined what modules we need. We started working on the module to detect sound input. We also started
+	stripping down the original code base and modifying to fit our needs.
 
 
 
