@@ -80,7 +80,7 @@ module snake(
 	// for debugging, show current state on leds
 	assign LEDR[4:0] = state;
 	
-	wire [13:0] random_out;
+	wire [14:0] random_out;
 
 	// Create an Instance of a VGA controller - there can be only one!
 	// Define the number of colours as well as the initial background
@@ -182,7 +182,7 @@ module snake(
 	
 	random random(
 		.clock(CLOCK_50),
-		.max_number(14'b11111111111111),
+		.max_number(15'b111111111111111),
 		.num_out(random_out)
 	);
 //	clock hexs
@@ -311,7 +311,6 @@ module control(
 					S_MAKE_APPLE_X = 5'd14, // load apple X
 					S_MAKE_APPLE_Y = 5'd15, // load apply Y
 					S_COLLISION_CHECK = 5'd16, // check if snaking is colliding with walls / itself
-					S_DRAW_SCORE 	= 5'd17, // draw score information
 					S_DRAW_END 		= 5'd18; // draw end game screen after dying
 
 	localparam 	LEFT 	= 2'b00,
@@ -319,12 +318,11 @@ module control(
 					DOWN 	= 2'b10,
 					UP 	= 2'b11;
 
-	wire [27:0] CLR_SCREEN_MAX, DRAW_WALLS_MAX, DRAW_SCORE_MAX, DRAW_SNAKE_MAX, DELAY_MAX, COLLISION_MAX, DRAW_END_MAX;
+	wire [27:0] CLR_SCREEN_MAX, DRAW_WALLS_MAX, DRAW_SNAKE_MAX, DELAY_MAX, COLLISION_MAX, DRAW_END_MAX;
 	assign CLR_SCREEN_MAX = 28'd32_000; // 160 * 120
 	assign DRAW_WALLS_MAX = 28'd32_000; // 4 * 160 + 4 * (120 - 4) - size of walls (add # randomly generated walls)
 	assign DRAW_SNAKE_MAX = snake_size;
 	assign COLLISION_MAX = snake_size + 1; // currently checking all snake blocks + 1 check for predetermined walls, this size can be expanded to check for other collisions in the future
-	assign DRAW_SCORE_MAX = 1240;
 	assign DRAW_END_MAX = 2500;
 	delay_calc delayer(
 		.snake_size(snake_size),
@@ -359,15 +357,9 @@ module control(
 				end
 			S_DRAW_WALLS: begin
 				if (counter == DRAW_WALLS_MAX)
-					next_state = S_DRAW_SCORE;
-				else
-					next_state = S_DRAW_WALLS;
-				end
-			S_DRAW_SCORE: begin
-				if (counter == DRAW_SCORE_MAX)
 					next_state = S_DRAW_APPLE;
 				else
-					next_state = S_DRAW_SCORE;
+					next_state = S_DRAW_WALLS;
 				end
 			S_DRAW_APPLE: next_state = S_DRAW_SNAKE;
 			S_DRAW_SNAKE: begin
@@ -430,9 +422,6 @@ module control(
 			S_DRAW_WALLS: begin
 				plot = 1'b1;
 				end
-			S_DRAW_SCORE: begin
-				plot = 1'b1;
-				end
 			S_DRAW_APPLE: begin
 				plot = 1'b1;
 				end
@@ -487,7 +476,7 @@ module datapath(
 	input [1:0] direction,
 	input grow, dead,
 	input [4:0] current_state, prev_state,
-	input [13:0] random_in,
+	input [14:0] random_in,
 	
 	output [12:0] LEDR,
 	
@@ -655,13 +644,13 @@ module datapath(
 				// positionally load random walls 
 				end
 			S_MAKE_APPLE_X: begin
-					if(random_in[6:0] >= 7'd100)
+					if(random_in[7:0] >= 8'd150)
 					begin
-						apple_x[7:0] <= random_in[6:0] + 8'd2 - 7'd100;
+						apple_x[7:0] <= random_in[7:0] - 8'd110;
 					end
 					else
 					begin
-						apple_x[7:0] <= random_in[6:0] + 8'd2;
+						apple_x[7:0] <= random_in[7:0] + 8'd3;
 					end
 					// update last apple colour
 					last_apple_colour = apple_colour;
@@ -674,13 +663,13 @@ module datapath(
 				end
 				
 			S_MAKE_APPLE_Y: begin
-				if(random_in[13:7] >= 7'd100)
+				if(random_in[14:8] >= 7'd100)
 				begin
-					apple_y[6:0] <= random_in[13:7] + 7'd2 - 7'd100;
+					apple_y[6:0] <= random_in[14:8] + 7'd2 - 7'd100;
 				end
 				else
 				begin
-				apple_y[6:0] <= random_in[13:7] + 7'd2;
+					apple_y[6:0] <= random_in[14:8] + 7'd2;
 				end
 			end
 			
@@ -694,184 +683,16 @@ module datapath(
 				end
 			S_DRAW_WALLS: begin
 				// set colour to blue
-				colour = 3'b001;
+				colour = 3'b100;
 				// if the counter represents a value where the border wall should be drawn (right side stops at pixel 120)
-				if(counter[14:7] < 8'd2 || counter[14:7] > 8'd119 || counter[6:0] < 7'd2 || counter[6:0] > 7'd117)
+				if(counter[14:7] < 8'd2 || counter[14:7] > 8'd158 || counter[6:0] < 7'd2 || counter[6:0] > 7'd117)
 					begin
 					draw_x = counter[14:7];
 					draw_y = counter[6:0];
 					end
 				counter = counter + 1'b1;
 				end
-			S_DRAW_SCORE: begin
-				high_nums_offset = 40;
-				if (counter == 0 || counter == 210 || counter == 240 || counter == 270 || counter == 300 || counter == 790 || counter == 820 || counter == 850 || counter == 880 || counter == 910 || counter == 940 || counter == 970 || counter == 1000 || counter == 1030 || counter == 1060 || counter == 1090 || counter == 1120 || counter == 1150 || counter == 1180 || counter == 1210)
-				//if (counter == 0 || counter == 210 || counter == 240 || counter == 270 || counter == 300 || counter == 720 || counter == 750 || counter == 780 || counter == 810 || counter == 840 || counter == 870 || counter == 900 || counter == 930 || counter == 960 || counter == 990 || counter == 1020 || counter == 1050 || counter == 1080 || counter == 1110 || counter == 1140)
-				begin
-					x = 0;
-					y = 0;
-				end
-				
-				// setting the width and position of the thing currently being drawn
-				if (counter < 210)
-				begin
-					width = 35;
-					x_offset = 0;
-					y_offset = 0;
-				end
-				// drawing each digit individually
-				else if (counter < 240)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = 10;
-				end
-				else if (counter < 270)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = 10;
-				end
-				else if (counter < 300)
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = 10;
-				end
-				//else if (counter < 720)
-				else if (counter < 790)
-				begin
-					width = 35;
-					x_offset = 00;
-					y_offset = 20;
-				end
-				//else if (counter < 750)
-				else if (counter < 820)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = high_nums_offset;
-				end
-				//else if (counter < 780)
-				else if (counter < 850)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = high_nums_offset;
-				end
-//				else if (counter < 810)
-				else if (counter < 880)
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = high_nums_offset;
-				end
-//				else if (counter < 840)
-				else if (counter < 910)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = high_nums_offset + 8'd7;
-				end
-//				else if (counter < 870)
-				else if (counter < 940)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = high_nums_offset + 8'd7;
-				end
-//				else if (counter < 900)
-				else if (counter < 970)
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = high_nums_offset + 8'd7;
-				end
-//				else if (counter < 930)
-				else if (counter < 1000)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = high_nums_offset + 8'd14;
-				end
-//				else if (counter < 960)
-				else if (counter < 1030)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = high_nums_offset + 8'd14;
-				end
-//				else if (counter < 990)
-				else if (counter < 1060)
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = high_nums_offset + 8'd14;
-				end
-//				else if (counter < 1020)
-				else if (counter < 1090)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = high_nums_offset + 8'd21;
-				end
-//				else if (counter < 1050)
-				else if (counter < 1120)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = high_nums_offset + 8'd21;
-				end
-//				else if (counter < 1080)
-				else if (counter < 1150)
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = high_nums_offset + 8'd21;
-				end
-//				else if (counter < 1110)
-				else if (counter < 1180)
-				begin
-					width = 6;
-					x_offset = 10;
-					y_offset = high_nums_offset + 8'd28;
-				end
-//				else if (counter < 1140)
-				else if (counter < 1210)
-				begin
-					width = 6;
-					x_offset = 16;
-					y_offset = high_nums_offset + 8'd28;
-				end
-				else
-				begin
-					width = 6;
-					x_offset = 22;
-					y_offset = high_nums_offset + 8'd28;
-				end
-				
-				// draw the current information at the calculated position in yellow
-				colour = 3'b110;
-				if(score_info[0] == 1)
-				begin
-					draw_x = 122 + x_offset + x;
-					draw_y = 15 + y_offset + y;
-				end
-				
-				// set the position of the next pixel
-				if (x == width - 1)
-				begin
-					x = 0;
-					y = y + 1;
-				end
-				else
-					x = x + 1;
-				
-				// move to next score information and increment counter
-				score_info = score_info >> 1;
-				counter = counter + 1'b1;
-				
-				end
+
 			S_DRAW_APPLE: begin
 				// set colour to red
 				colour = apple_colour[2:0];
@@ -1021,7 +842,7 @@ module datapath(
 				else
 				begin
 					// if the snake makes contact with the predetermined walls, there is a collision
-					if(snake_x[7:0] < 8'd2 || snake_x[7:0] > 8'd119 || snake_y[7:0] < 8'd2 || snake_y[7:0] > 8'd117)
+					if(snake_x[7:0] < 8'd2 || snake_x[7:0] > 8'd158 || snake_y[7:0] < 8'd2 || snake_y[7:0] > 8'd117)
 						collision = 1'b1;
 				end
 
