@@ -1,0 +1,40 @@
+
+State Machine - |snake|control:c0|current_state
+Name current_state.S_DRAW_END current_state.S_COLLISION_CHECK current_state.S_MAKE_APPLE_Y current_state.S_MAKE_APPLE_X current_state.S_DELAY current_state.S_SCORE_MENU current_state.S_DEAD current_state.S_MUNCHING current_state.S_MOVING current_state.S_DRAW_SNAKE current_state.S_DRAW_APPLE current_state.S_DRAW_WALLS current_state.S_CLR_SCREEN current_state.S_LOAD_GAME current_state.S_STARTING_WAIT current_state.S_STARTING current_state.S_MAIN_MENU 
+current_state.S_MAIN_MENU 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+current_state.S_STARTING 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+current_state.S_STARTING_WAIT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+current_state.S_LOAD_GAME 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+current_state.S_CLR_SCREEN 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+current_state.S_DRAW_WALLS 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+current_state.S_DRAW_APPLE 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+current_state.S_DRAW_SNAKE 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+current_state.S_MOVING 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+current_state.S_MUNCHING 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+current_state.S_DEAD 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+current_state.S_SCORE_MENU 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+current_state.S_DELAY 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+current_state.S_MAKE_APPLE_X 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
+current_state.S_MAKE_APPLE_Y 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+current_state.S_COLLISION_CHECK 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+current_state.S_DRAW_END 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |snake|control:c0|previous_state
+Name previous_state.S_DRAW_END previous_state.S_COLLISION_CHECK previous_state.S_MAKE_APPLE_Y previous_state.S_MAKE_APPLE_X previous_state.S_DELAY previous_state.S_SCORE_MENU previous_state.S_DEAD previous_state.S_MUNCHING previous_state.S_MOVING previous_state.S_DRAW_SNAKE previous_state.S_DRAW_APPLE previous_state.S_DRAW_WALLS previous_state.S_CLR_SCREEN previous_state.S_LOAD_GAME previous_state.S_STARTING_WAIT previous_state.S_STARTING previous_state.S_MAIN_MENU 
+previous_state.S_MAIN_MENU 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+previous_state.S_STARTING 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+previous_state.S_STARTING_WAIT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+previous_state.S_LOAD_GAME 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+previous_state.S_CLR_SCREEN 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+previous_state.S_DRAW_WALLS 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+previous_state.S_DRAW_APPLE 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+previous_state.S_DRAW_SNAKE 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+previous_state.S_MOVING 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+previous_state.S_MUNCHING 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+previous_state.S_DEAD 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_SCORE_MENU 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_DELAY 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_MAKE_APPLE_X 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_MAKE_APPLE_Y 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_COLLISION_CHECK 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+previous_state.S_DRAW_END 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
