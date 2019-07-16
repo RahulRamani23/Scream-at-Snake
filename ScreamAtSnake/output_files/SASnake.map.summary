@@ -1,0 +1,14 @@
+Analysis & Synthesis Status : Successful - Tue Jul 09 17:27:36 2019
+Quartus Prime Version : 18.1.0 Build 625 09/12/2018 SJ Lite Edition
+Revision Name : SASnake
+Top-level Entity Name : SASnake
+Family : Cyclone IV E
+Total logic elements : 150
+    Total combinational functions : 138
+    Dedicated logic registers : 58
+Total registers : 58
+Total pins : 50
+Total virtual pins : 0
+Total memory bits : 57,600
+Embedded Multiplier 9-bit elements : 0
+Total PLLs : 1

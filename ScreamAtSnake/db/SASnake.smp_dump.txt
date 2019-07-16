@@ -1,0 +1,10 @@
+
+State Machine - |SASnake|control:c0|current_state
+Name current_state.finish current_state.S_LOAD_C_WAIT current_state.S_LOAD_C current_state.S_LOAD_y_WAIT current_state.S_LOAD_y current_state.S_LOAD_x_WAIT current_state.S_LOAD_x 
+current_state.S_LOAD_x 0 0 0 0 0 0 0 
+current_state.S_LOAD_x_WAIT 0 0 0 0 0 1 1 
+current_state.S_LOAD_y 0 0 0 0 1 0 1 
+current_state.S_LOAD_y_WAIT 0 0 0 1 0 0 1 
+current_state.S_LOAD_C 0 0 1 0 0 0 1 
+current_state.S_LOAD_C_WAIT 0 1 0 0 0 0 1 
+current_state.finish 1 0 0 0 0 0 1 

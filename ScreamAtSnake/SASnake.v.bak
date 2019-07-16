@@ -1,0 +1,220 @@
+// Part 2 skeleton
+
+module lab_6_2
+	(
+		CLOCK_50,						//	On Board 50 MHz
+		// Your inputs and outputs here
+        KEY,
+        SW,
+		// The ports below are for the VGA output.  Do not change.
+		VGA_CLK,   						//	VGA Clock
+		VGA_HS,							//	VGA H_SYNC
+		VGA_VS,							//	VGA V_SYNC
+		VGA_BLANK_N,						//	VGA BLANK
+		VGA_SYNC_N,						//	VGA SYNC
+		VGA_R,   						//	VGA Red[9:0]
+		VGA_G,	 						//	VGA Green[9:0]
+		VGA_B   						//	VGA Blue[9:0]
+	);
+
+	input			CLOCK_50;				//	50 MHz
+	input   [9:0]   SW;
+	input   [3:0]   KEY;
+
+	// Declare your inputs and outputs here
+	// Do not change the following outputs
+	output			VGA_CLK;   				//	VGA Clock
+	output			VGA_HS;					//	VGA H_SYNC
+	output			VGA_VS;					//	VGA V_SYNC
+	output			VGA_BLANK_N;				//	VGA BLANK
+	output			VGA_SYNC_N;				//	VGA SYNC
+	output	[9:0]	VGA_R;   				//	VGA Red[9:0]
+	output	[9:0]	VGA_G;	 				//	VGA Green[9:0]
+	output	[9:0]	VGA_B;   				//	VGA Blue[9:0]
+	
+	wire resetn;
+	assign resetn = KEY[0];
+	
+	// Create the colour, x, y and writeEn wires that are inputs to the controller.
+	wire [2:0] colour;
+	wire [7:0] x;
+	wire [6:0] y;
+	wire writeEn;
+
+	// Create an Instance of a VGA controller - there can be only one!
+	// Define the number of colours as well as the initial background
+	// image file (.MIF) for the controller.
+	vga_adapter VGA(
+			.resetn(resetn),
+			.clock(CLOCK_50),
+			.colour(colour),
+			.x(x),
+			.y(y),
+			.plot(writeEn),
+			/* Signals for the DAC to drive the monitor. */
+			.VGA_R(VGA_R),
+			.VGA_G(VGA_G),
+			.VGA_B(VGA_B),
+			.VGA_HS(VGA_HS),
+			.VGA_VS(VGA_VS),
+			.VGA_BLANK(VGA_BLANK_N),
+			.VGA_SYNC(VGA_SYNC_N),
+			.VGA_CLK(VGA_CLK));
+		defparam VGA.RESOLUTION = "160x120";
+		defparam VGA.MONOCHROME = "FALSE";
+		defparam VGA.BITS_PER_COLOUR_CHANNEL = 1;
+		defparam VGA.BACKGROUND_IMAGE = "black.mif";
+			
+	// Put your code here. Your code should produce signals x,y,colour and writeEn/plot
+	// for the VGA controller, in addition to any other functionality your design may require.
+		control c0(.clk(CLOCK_50),
+						.resetn(resetn),
+						.go(~KEY[3]),
+						.plot(~KEY[1]),
+						.ld_x(ldx),
+						.ld_y(ldy),
+						.ld_c(ldc),
+						.enable(writeEn));
+				
+		 datapath d0(	
+					.clk(CLOCK_50),
+					.ld_x(ldx),
+					.ld_y(ldy),
+					.ld_c(ldc),
+					.resetn(resetn),
+					.colourIn(SW[9:7]),
+					.coordIn(SW[6:0]),
+					.xOut(x),
+					.yOut(y),
+					.colourOut(colour),
+					.enableCounter(writeEn));
+					
+endmodule
+	
+	
+module control(
+    input clk,
+    input resetn,
+    input go,
+	 input plot,
+    output reg  ld_x, ld_y, ld_c, enable
+    );
+
+    reg [5:0] current_state, next_state; 
+    
+    localparam  S_LOAD_x        = 3'd0,
+                S_LOAD_x_WAIT   = 3'd1,
+                S_LOAD_y        = 3'd2,
+                S_LOAD_y_WAIT   = 3'd3,
+                S_LOAD_C        = 3'd4,
+                S_LOAD_C_WAIT   = 3'd5,
+					 finish 			  = 3'd6;
+    
+    // Next state logic aka our state table
+    always@(*)
+    begin: state_table 
+            case (current_state)
+                S_LOAD_x: next_state = go ? S_LOAD_x_WAIT : S_LOAD_x; // Loop in current state until value is input
+                S_LOAD_x_WAIT: next_state = go ? S_LOAD_x_WAIT : S_LOAD_y; // Loop in current state until go signal goes low
+                S_LOAD_y: next_state = go ? S_LOAD_y_WAIT : S_LOAD_y; // Loop in current state until value is input
+                S_LOAD_y_WAIT: next_state = go ? S_LOAD_y_WAIT : S_LOAD_C; // Loop in current state until go signal goes low
+                S_LOAD_C: next_state = plot ? S_LOAD_C_WAIT : S_LOAD_C; // Loop in current state until value is input
+                S_LOAD_C_WAIT: next_state = plot ? S_LOAD_C_WAIT : finish; // Loop in current state until go signal goes low
+                finish: next_state = go ? S_LOAD_x : finish;
+            default:  next_state = S_LOAD_x;
+        endcase
+    end // state_table
+   
+
+    // Output logic aka all of our datapath control signals
+    always @(*)
+    begin: enable_signals
+        // By default make all our signals 0
+        ld_x = 1'b0;
+        ld_y = 1'b0;
+        ld_c = 1'b0;
+		  enable = 1'b0;
+		  
+        case (current_state)
+            S_LOAD_x: begin
+                ld_x = 1'b1;
+                end
+            S_LOAD_y: begin
+                ld_y = 1'b1;
+                end
+            S_LOAD_C: begin
+                ld_c = 1'b1;
+                end
+            finish: begin
+                enable = 1'b1;
+                end
+        // default:    // don't need default since we already made sure all of our outputs were assigned a value at the start of the always block
+        endcase
+    end // enable_signals
+   
+    // current_state registers
+    always@(posedge clk)
+    begin: state_FFs
+        if(!resetn)
+            current_state <= S_LOAD_x;
+        else
+            current_state <= next_state;
+    end // state_FFS
+endmodule
+
+module datapath(
+    input clk,
+    input resetn,
+	 input enableCounter,
+    input ld_x, ld_y, ld_c,
+    input [6:0] coordIn,
+	 input [2:0] colourIn,
+    output [6:0] xOut, yOut,
+	 output [2:0] colourOut
+    );
+    
+    // input registers
+    reg [6:0] x, y;
+	 reg [2:0] colour;
+    
+    // Registers a, b, c, x with respective input logic
+    always@(posedge clk) begin
+        if(!resetn) begin
+            y <= 7'b0; 
+            colour <= 3'b0; 
+            x <= 7'b0; 
+        end
+        else begin
+            if(ld_x)
+                x<= coordIn; // load alu_out if load_alu_out signal is high, otherwise load from data_in
+            if(ld_y)
+                y <= coordIn; // load alu_out if load_alu_out signal is high, otherwise load from data_in
+            if(ld_c)
+                colour <= colourIn;
+        end
+    end
+	 
+	 reg [3:0] count = 4'b1111;
+	 
+	 //counter
+	 always@(posedge clk) begin
+        if(!resetn) begin
+            count <= 4'b0000; 
+        end
+        else if(enableCounter) begin
+            if(count == 4'b1111) begin
+                count <= 4'b0000;
+				end
+				else begin
+					count = count + 1'b1;
+				end
+			end
+    end
+	 
+	 
+	 assign xOut = x + count[1:0];
+	 assign yOut = y + count[3:2];
+	 assign colourOut = colour;
+	 
+endmodule
+
