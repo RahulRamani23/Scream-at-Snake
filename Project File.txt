@@ -74,6 +74,14 @@ Week 1:
 	settings. We planned out exactly how we plan on executing this idea and determined what modules we need. We started working on the module to detect sound input. We also started
 	stripping down the original code base and modifying to fit our needs.
 
+Week 2:
+	This week we got the sound sensor to work and so we implemented the ability for the user to control the snakes direction by screaming into the sensor.
+	We were also able to work out new difficulty levels for the game (The snakes speed increases with difficulty) and this can be controlled by the user using the switches which 
+	represent the different levels.
+	We are currently working on getting the HEX Display to display the users score rather than on screen updates so the game can utilize the entire display.
+	Moving forward we plan to implement new game modes such as a time trial mode where the user has a certain amount of time to collect a certain amount of apples (or as much as they can)
+	The other game modes will be added in as we finish the others and troubleshoot ongoing issues. 
+
 
 
 References
