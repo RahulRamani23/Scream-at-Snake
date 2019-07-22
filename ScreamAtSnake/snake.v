@@ -114,6 +114,7 @@ module snake(
 	
 	// Create the control and datapath
 	control c0(
+		.diff(SW[17:16]),
 		.clk(clk),
 		.press_button(press_button),
 		
@@ -256,6 +257,7 @@ module snake(
 endmodule
 
 module control(
+	input [1:0] diff,
 	input clk,
 	// Input to start game / move between menus
 	input press_button,
@@ -324,9 +326,19 @@ module control(
 	assign DRAW_SNAKE_MAX = snake_size;
 	assign COLLISION_MAX = snake_size + 1; // currently checking all snake blocks + 1 check for predetermined walls, this size can be expanded to check for other collisions in the future
 	assign DRAW_END_MAX = 2500;
+	reg [27:0] speed;
+	always @ (*)
+	begin
+		case(diff)
+			3'b00: speed <= 28'd9_000_000;
+			3'b01: speed <= 28'd4_000_000;
+			3'b10: speed <= 28'd4_000_000;
+			3'b11: speed <= 28'd1_000_000;
+		endcase
+	end
 	delay_calc delayer(
 		.snake_size(snake_size),
-		.base_ticks(28'd8_000_000 - 1),
+		.base_ticks(speed - 1),
 		.delay_max(DELAY_MAX)
 		);
 		
