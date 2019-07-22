@@ -1,5 +1,6 @@
-module Sound_Module(sound, out);
+module Sound_Module(sound, out, enable);
 	input sound;
+	input enable;
 	output out;
 	
 	reg sig;
@@ -10,6 +11,6 @@ module Sound_Module(sound, out);
 		if (sound)
 			sig = 1'b0;
 	end
-	assign out = sig;
+	assign out = sig || ~enable;
 	
 endmodule	

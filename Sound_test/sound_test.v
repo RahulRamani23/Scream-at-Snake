@@ -1,9 +1,7 @@
-module sound_test(GPIO, LEDR, CLOCK50, KEY);
+module sound_test(GPIO, LEDR, SW);
 	input [0:0]GPIO;
-	input CLOCK50;
-	input [3:0]KEY;
+	input [17:0]SW;
 	output [17:0]LEDR;
-	Sound_Module sound(GPIO[0], LEDR[0]);
-	assign LEDR[1] = KEY[0];
+	Sound_Module sound(.sound(GPIO[0]), .out(LEDR[0]), .enable(SW[1]));
 endmodule
 	

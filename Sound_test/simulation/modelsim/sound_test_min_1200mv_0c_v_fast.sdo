@@ -29,7 +29,7 @@
 (DELAYFILE
   (SDFVERSION "2.1")
   (DESIGN "sound_test")
-  (DATE "07/19/2019 17:11:51")
+  (DATE "07/22/2019 16:26:19")
   (VENDOR "Altera")
   (PROGRAM "Quartus Prime")
   (VERSION "Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition")
@@ -41,18 +41,8 @@
     (INSTANCE LEDR\[0\]\~output)
     (DELAY
       (ABSOLUTE
-        (PORT i (3318:3318:3318) (2909:2909:2909))
-        (IOPATH i o (1635:1635:1635) (1632:1632:1632))
-      )
-    )
-  )
-  (CELL
-    (CELLTYPE "cycloneive_io_obuf")
-    (INSTANCE LEDR\[1\]\~output)
-    (DELAY
-      (ABSOLUTE
-        (PORT i (2126:2126:2126) (2379:2379:2379))
-        (IOPATH i o (1572:1572:1572) (1575:1575:1575))
+        (PORT i (1921:1921:1921) (2242:2242:2242))
+        (IOPATH i o (1632:1632:1632) (1635:1635:1635))
       )
     )
   )
@@ -67,10 +57,22 @@
   )
   (CELL
     (CELLTYPE "cycloneive_io_ibuf")
-    (INSTANCE KEY\[0\]\~input)
+    (INSTANCE SW\[1\]\~input)
     (DELAY
       (ABSOLUTE
-        (IOPATH i o (288:288:288) (668:668:668))
+        (IOPATH i o (338:338:338) (718:718:718))
+      )
+    )
+  )
+  (CELL
+    (CELLTYPE "cycloneive_lcell_comb")
+    (INSTANCE sound\|out)
+    (DELAY
+      (ABSOLUTE
+        (PORT datab (1786:1786:1786) (2017:2017:2017))
+        (PORT datad (1655:1655:1655) (1835:1835:1835))
+        (IOPATH datab combout (160:160:160) (156:156:156))
+        (IOPATH datad combout (68:68:68) (63:63:63))
       )
     )
   )
