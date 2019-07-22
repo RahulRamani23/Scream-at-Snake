@@ -1,0 +1,3 @@
+module Sound_Module(GPIO, LEDR);
+	input GPIO[0:0]
+	output LEDR[0:0]

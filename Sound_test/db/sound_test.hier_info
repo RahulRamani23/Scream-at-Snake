@@ -1,0 +1,32 @@
+|sound_test
+GPIO[0] => GPIO[0].IN1
+LEDR[0] <= Sound_Module:sound.port1
+LEDR[1] <= KEY[0].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[2] <= <GND>
+LEDR[3] <= <GND>
+LEDR[4] <= <GND>
+LEDR[5] <= <GND>
+LEDR[6] <= <GND>
+LEDR[7] <= <GND>
+LEDR[8] <= <GND>
+LEDR[9] <= <GND>
+LEDR[10] <= <GND>
+LEDR[11] <= <GND>
+LEDR[12] <= <GND>
+LEDR[13] <= <GND>
+LEDR[14] <= <GND>
+LEDR[15] <= <GND>
+LEDR[16] <= <GND>
+LEDR[17] <= <GND>
+CLOCK50 => ~NO_FANOUT~
+KEY[0] => LEDR[1].DATAIN
+KEY[1] => ~NO_FANOUT~
+KEY[2] => ~NO_FANOUT~
+KEY[3] => ~NO_FANOUT~
+
+
+|sound_test|Sound_Module:sound
+sound => out.DATAIN
+out <= sound.DB_MAX_OUTPUT_PORT_TYPE
+
+

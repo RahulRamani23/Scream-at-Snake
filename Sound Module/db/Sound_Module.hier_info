@@ -1,0 +1,5 @@
+|Sound_Module
+GPIO[0] => out.DATAIN
+out <= GPIO[0].DB_MAX_OUTPUT_PORT_TYPE
+
+

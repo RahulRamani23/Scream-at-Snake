@@ -1,0 +1,4 @@
+module sound_test(GPIO, LEDR);
+	input [0:0]GPIO;
+	output [17:0]LEDR;
+	
