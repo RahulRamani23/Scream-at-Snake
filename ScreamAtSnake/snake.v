@@ -2,6 +2,7 @@ module snake(
 	input [17:0] SW,
 	input [3:0] KEY,
 	input CLOCK_50,
+	input [0:0]GPIO,
 	
 	input PS2_KBCLK,
 	input PS2_KBDAT,
@@ -81,6 +82,10 @@ module snake(
 	assign LEDR[4:0] = state;
 	
 	wire [14:0] random_out;
+	
+	//output signal for sound module
+	wire [0:0] sound_out_wire;
+	Sound_Module SM(.sound(GPIO[0]), .out(sound_out_wire), .enable(SW[1]));
 
 	// Create an Instance of a VGA controller - there can be only one!
 	// Define the number of colours as well as the initial background
@@ -139,8 +144,8 @@ module snake(
 		.dead(dead),
 		.direction(direction),
 		.curr_state(state),
-		.prev_state(prev_state)
-		);
+		.prev_state(prev_state),
+		.sound_in(sound_out_wire));
 		
 	datapath d0(
 		.clk(clk),
@@ -289,7 +294,9 @@ module control(
 	output reg [1:0] direction,
 	// Current state (for testing purposes)
 	// Has extra bit so that space can be used if needed
-	output [4:0] curr_state, prev_state
+	output [4:0] curr_state, prev_state,
+	//input from sound module
+	input sound_in
 	);
 	
 	reg [4:0] previous_state, current_state, next_state; 
@@ -446,13 +453,13 @@ module control(
 			S_MOVING: begin
 				// not sure if these checks should be done only in moving state
 				// wondering if they'll register if you press the button at the wrong time
-				if (mv_left && direction != RIGHT)
+				if ((mv_left && sound_in)  && direction != RIGHT)
 					direction = LEFT;
-				else if (mv_right && direction != LEFT)
+				else if ((mv_right && sound_in) && direction != LEFT)
 					direction = RIGHT;
-				else if (mv_down && direction != UP)
+				else if ((mv_down && sound_in) && direction != UP)
 					direction = DOWN;
-				else if (mv_up && direction != DOWN)
+				else if ((mv_up && sound_in) && direction != DOWN)
 					direction = UP;
 				end
 			S_MUNCHING: begin
@@ -568,6 +575,7 @@ module datapath(
 	reg [3:0] poison_counter;
 	reg toggle;
 	
+	reg [3:0]p_counter = 4'b0;
 	 // Input logic
     always @(posedge clk)
     begin: enable_signals
@@ -783,16 +791,17 @@ module datapath(
 					rainbow_order[14:12] = snake_colour[2:0];
 					end
 					
-				// if the last apple eaten was purple
-				if(last_apple_colour[2:0] == 3'b101 && snake_size > 5)
+				// if the last apple eaten was purple we have steroid mode
+				if(last_apple_colour[2:0] == 3'b101 && p_counter < 4'b1111)
 					begin
 						if(poison_counter == 3'b100)
 								poison_counter = 0;
 						if(poison_counter == 0)
 						begin
 
-							// decrement snake size
-							snake_size = snake_size - 1;
+							// increment snake size
+							snake_size = snake_size + 1;
+							p_counter = p_counter + 1;
 							if(toggle == 1)
 								begin
 									toggle = 0;
@@ -808,6 +817,9 @@ module datapath(
 					end
 				else if (last_apple_colour[2:0] == 3'b101 )
 					snake_colour = snake_colour_101;
+					
+				if (last_apple_colour[2:0] != 3'b101)
+					p_counter = 2'd0;
 				end
 					
 			S_MUNCHING: begin
@@ -1042,31 +1054,6 @@ module input_control(
 			mv_right = ~keys[0];
 			mv_down = ~keys[2];
 			mv_up = ~keys[1];
-		end
-		
-		// if the apple last eaten was green (drunk apple)
-		if(last_apple_colour == 3'b010)
-		begin
-			if(mv_left)
-				begin
-				mv_left = 0;
-				mv_right = 1;
-				end
-			else if(mv_right)
-				begin
-					mv_left =	1;
-					mv_right = 0;
-				end
-			else if(mv_up)
-				begin
-					mv_down = 1;
-					mv_up = 0;
-				end
-			else if(mv_down)
-				begin
-					mv_up =	1;
-					mv_down = 0;
-				end
 		end
 	end
 endmodule
