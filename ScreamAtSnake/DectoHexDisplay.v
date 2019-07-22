@@ -6,7 +6,8 @@
 //LEDR[0] output display
 
 module DectoHexDisplay(
-    input [7:0] score_input
+    input [7:0] score_input,
+	 output [11:0] hexval 
 );
 
 	wire [29:0] digit_2, digit_1, digit_0;
@@ -19,74 +20,14 @@ module DectoHexDisplay(
 		 value_2 <= (score_input / 100) % 10; // Hundreds
 		 value_1 <= (score_input / 10) % 10; // tens
 		 value_0 <= score_input % 10 ; // ones
+		 if(value_2 == 4'b0010 & value_1 == 4'b0101 & value_0 == 4'b0001)
+		 begin
+			value_2 <= 4'b0000;
+			value_1 <= 4'b0000;
+			value_0 <= 4'b0000;
+		 end
 	end
-	DtoHex hundred(
-		.HexA(HEX2),
-		.inD(value_2)
-	);
-	DtoHex tens(
-		.HexA(HEX1),
-		.inD(value_2)
-	);
-	DtoHex ones(
-		.HexA(HEX0),
-		.inD(value_2)
-	);
-
-endmodule
-
-module DtoHex(input[6:0] HexA, input inD);
-	reg [3:0] outB;
-	// First convert from decimal to binary
-	always @(*)
-	begin
-		if(inD == 1'd9)
-		begin
-			outB = 4'b1001;
-		end
-		else if(inD == 1'd8)
-		begin
-			outB = 4'b1000;
-		end
-		else if(inD == 1'd7)
-		begin
-			outB = 4'b0111;
-		end
-		else if(inD == 1'd6)
-		begin
-			outB = 4'b0101;
-		end
-		else if(inD == 1'd5)
-		begin
-			outB = 4'b0101;
-		end
-		else if(inD == 1'd4)
-		begin
-			outB = 4'b0100;
-		end
-		else if(inD == 1'd3)
-		begin
-			outB = 4'b0011;
-		end
-		else if(inD == 1'd2)
-		begin
-			outB = 4'b0011;
-		end
-		else if(inD == 1'd1)
-		begin
-			outB = 4'b0001;
-		end
-		else if(inD == 1'd0)
-		begin
-			outB = 4'b0000;
-		end
-	end
-	
-	// Call the Hex decoder to display on the hex
-	HEXDec(
-		.Input(outB),
-		.Hex(HexA)
-	);
+	assign hexval = {value_2, value_1, value_0};
 endmodule
 
 module HEXDec(Input, Hex);
@@ -102,6 +43,7 @@ module HEXDec(Input, Hex);
 	
 	
 endmodule
+
 	
 module HexSeg_0(c0, c1, c2, c3, m);
 	input c0, c1, c2, c3;
