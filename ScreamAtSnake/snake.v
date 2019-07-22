@@ -167,7 +167,13 @@ module snake(
 		.prev_state(prev_state),
 
 		.collision(collision),
-		.last_apple_colour(last_apple_colour)
+		.last_apple_colour(last_apple_colour),
+		.hex0(HEX0),
+		.hex1(HEX1),
+		.hex2(HEX2),
+		.hex4(HEX4),
+		.hex5(HEX5),
+		.hex6(HEX6)
 		);
 		
 	wire slow_clk;
@@ -506,7 +512,13 @@ module datapath(
 	output reg [6:0] draw_y,
 
 	output reg collision,
-	output reg [2:0] last_apple_colour
+	output reg [2:0] last_apple_colour,
+	output [6:0] hex0,
+	output [6:0] hex1,
+	output [6:0] hex2,
+	output [6:0] hex4,
+	output [6:0] hex5,
+	output [6:0] hex6
 	);
 	
 	reg [1:0]snake_dir;
@@ -609,6 +621,8 @@ module datapath(
 //						.hi4(hi4),
 //						.hi5(hi5),
 //					);
+
+				snake_size = 8'd5;
 	
 				end
 			S_STARTING: begin
@@ -960,12 +974,29 @@ module datapath(
 	 // Pixel information for the player's current score (their size)
 	 wire [89:0] score_num_wire;
 	 wire [7:0] score;
+	 
 	 assign score = snake_size - 8'd5;
 	 score_to_display display_score(
 		.score_display(score_num_wire),
 		.score_input(score)
 		);
-
+		
+	wire [11:0] hexval;
+	DectoHexDisplay dec(.score_input(score), .hexval(hexval));
+	HEXDec(
+		.Input(hexval[3:0]),
+		.Hex(hex0)
+	);
+	
+	HEXDec(
+		.Input(hexval[7:4]),
+		.Hex(hex1)
+	);
+	
+	HEXDec(
+		.Input(hexval[11:8]),
+		.Hex(hex2)
+	);
 		
 	// get the highscores
 	
@@ -1006,6 +1037,24 @@ module datapath(
 		.score_display(hi5_num),
 		.score_input(hi5)
 		);
+		
+	wire [11:0] hexhi;
+	
+	DectoHexDisplay dec2(.score_input(hi1), .hexval(hexhi));
+	HEXDec(
+		.Input(hexhi[3:0]),
+		.Hex(hex4)
+	);
+	
+	HEXDec(
+		.Input(hexhi[7:4]),
+		.Hex(hex5)
+	);
+	
+	HEXDec(
+		.Input(hexhi[11:8]),
+		.Hex(hex6)
+	);
 		
 	// end game screen draw stuff
 	wire [2499:0] endgame_grid;
