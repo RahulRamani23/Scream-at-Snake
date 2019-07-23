@@ -2,6 +2,7 @@ module snake(
 	input [17:0] SW,
 	input [3:0] KEY,
 	input CLOCK_50,
+	input [0:0]GPIO,
 	
 	input PS2_KBCLK,
 	input PS2_KBDAT,
@@ -39,15 +40,6 @@ module snake(
 		.last_apple_colour(last_apple_colour)
 	);
 	
-//	assign mv_left = ~KEY[3];
-//	assign mv_right = ~KEY[0];
-//	assign mv_down = ~KEY[2];
-//	assign mv_up = ~KEY[1];
-	
-//	assign mv_left = key_input[2];
-//	assign mv_right = key_input[3];
-//	assign mv_down = key_input[1];
-//	assign mv_up = key_input[0];
 	
 	
 	// Any button is being pressed to start the game
@@ -207,73 +199,7 @@ module snake(
 		.Input(4'b1100),
 		.Hex(HEX3)
 	);
-//	clock hexs
-//	hex_display hex_0(
-//		.IN(counter[3:0]),
-//		.OUT(HEX0)
-//		);
-//
-//	hex_display hex_1(
-//		.IN(counter[7:4]),
-//		.OUT(HEX1)
-//		);
-//	
-//	hex_display hex_2(
-//		.IN(counter[11:8]),
-//		.OUT(HEX2)
-//		);
-//	
-//	hex_display hex_3(
-//		.IN(counter[15:12]),
-//		.OUT(HEX3)
-//		);
-//	
-//	hex_display hex_4(
-//		.IN(counter[19:16]),
-//		.OUT(HEX4)
-//		);
-//	
-//	hex_display hex_5(
-//		.IN(counter[23:20]),
-//		.OUT(HEX5)
-//		);
-//	
-//	hex_display hex_6(
-//		.IN(counter[27:24]),
-//		.OUT(HEX6)
-//		);
-	
-// snake size hexs
-//	hex_display hex_0(
-//		.IN(snake_size[3:0]),
-//		.OUT(HEX0)
-//		);
-//	
-//	hex_display hex_1(
-//		.IN(snake_size[7:4]),
-//		.OUT(HEX1)
-//		);
 
-// apple coordinates (random)
-//	hex_display hex_0(
-//		.IN(apple_x[3:0]),
-//		.OUT(HEX0)
-//		);
-//
-//	hex_display hex_1(
-//		.IN(apple_x[7:4]),
-//		.OUT(HEX1)
-//		);
-//
-//	hex_display hex_2(
-//		.IN(apple_y[3:0]),
-//		.OUT(HEX2)
-//		);
-//
-//	hex_display hex_3(
-//		.IN({1'b0, apple_y[6:4]}),
-//		.OUT(HEX3)
-//		);
 		
 endmodule
 
@@ -310,7 +236,7 @@ module control(
 	output reg [1:0] direction,
 	// Current state (for testing purposes)
 	// Has extra bit so that space can be used if needed
-	output [4:0] curr_state, prev_state
+	output [4:0] curr_state, prev_state,
 	//input from sound module
 	input sound_in
 	);
@@ -624,20 +550,6 @@ module datapath(
         case (current_state)
 			S_MAIN_MENU: begin
 			
-//					highscore_tracker highscores2(
-//						.curr_score(score),
-//						.curr_hi1(8'b0),
-//						.curr_hi2(8'b0),
-//						.curr_hi3(8'b0),
-//						.curr_hi4(8'b0),
-//						.curr_hi5(8'b0),
-//						.update(update),
-//						.hi1(hi1),
-//						.hi2(hi2),
-//						.hi3(hi3),
-//						.hi4(hi4),
-//						.hi5(hi5),
-//					);
 
 				snake_size = 8'd5;
 	
