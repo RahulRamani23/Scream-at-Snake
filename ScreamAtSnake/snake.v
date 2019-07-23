@@ -2,7 +2,7 @@ module snake(
 	input [17:0] SW,
 	input [3:0] KEY,
 	input CLOCK_50,
-	input [0:0]GPIO,
+	input [0:0] GPIO,
 	
 	input PS2_KBCLK,
 	input PS2_KBDAT,
@@ -40,6 +40,15 @@ module snake(
 		.last_apple_colour(last_apple_colour)
 	);
 	
+//	assign mv_left = ~KEY[3];
+//	assign mv_right = ~KEY[0];
+//	assign mv_down = ~KEY[2];
+//	assign mv_up = ~KEY[1];
+	
+//	assign mv_left = key_input[2];
+//	assign mv_right = key_input[3];
+//	assign mv_down = key_input[1];
+//	assign mv_up = key_input[0];
 	
 	
 	// Any button is being pressed to start the game
@@ -73,6 +82,7 @@ module snake(
 	assign LEDR[4:0] = state;
 	
 	wire [14:0] random_out;
+	wire [14:0] random_out2;
 	
 	//output signal for sound module
 	wire [0:0] sound_out_wire;
@@ -145,6 +155,7 @@ module snake(
 		.grow(grow),
 		.dead(dead),
 		.random_in(random_out),
+		.random_in2(random_out),
 		
 		.LEDR(LEDR[17:5]),
 		
@@ -170,7 +181,8 @@ module snake(
 		.hex2(HEX2),
 		.hex4(HEX4),
 		.hex5(HEX5),
-		.hex6(HEX6)
+		.hex6(HEX6),
+		.wall(SW[15])
 		);
 		
 		
@@ -191,6 +203,11 @@ module snake(
 		.max_number(15'b111111111111111),
 		.num_out(random_out)
 	);
+	random random2(
+		.clock(CLOCK_50),
+		.max_number(15'b111111111111111),
+		.num_out(random_out2)
+	);
 	
 	HEXH(HEX7);
 	
@@ -199,7 +216,73 @@ module snake(
 		.Input(4'b1100),
 		.Hex(HEX3)
 	);
+//	clock hexs
+//	hex_display hex_0(
+//		.IN(counter[3:0]),
+//		.OUT(HEX0)
+//		);
+//
+//	hex_display hex_1(
+//		.IN(counter[7:4]),
+//		.OUT(HEX1)
+//		);
+//	
+//	hex_display hex_2(
+//		.IN(counter[11:8]),
+//		.OUT(HEX2)
+//		);
+//	
+//	hex_display hex_3(
+//		.IN(counter[15:12]),
+//		.OUT(HEX3)
+//		);
+//	
+//	hex_display hex_4(
+//		.IN(counter[19:16]),
+//		.OUT(HEX4)
+//		);
+//	
+//	hex_display hex_5(
+//		.IN(counter[23:20]),
+//		.OUT(HEX5)
+//		);
+//	
+//	hex_display hex_6(
+//		.IN(counter[27:24]),
+//		.OUT(HEX6)
+//		);
+	
+// snake size hexs
+//	hex_display hex_0(
+//		.IN(snake_size[3:0]),
+//		.OUT(HEX0)
+//		);
+//	
+//	hex_display hex_1(
+//		.IN(snake_size[7:4]),
+//		.OUT(HEX1)
+//		);
 
+// apple coordinates (random)
+//	hex_display hex_0(
+//		.IN(apple_x[3:0]),
+//		.OUT(HEX0)
+//		);
+//
+//	hex_display hex_1(
+//		.IN(apple_x[7:4]),
+//		.OUT(HEX1)
+//		);
+//
+//	hex_display hex_2(
+//		.IN(apple_y[3:0]),
+//		.OUT(HEX2)
+//		);
+//
+//	hex_display hex_3(
+//		.IN({1'b0, apple_y[6:4]}),
+//		.OUT(HEX3)
+//		);
 		
 endmodule
 
@@ -438,6 +521,7 @@ module datapath(
 	input grow, dead,
 	input [4:0] current_state, prev_state,
 	input [14:0] random_in,
+	input [14:0] random_in2,
 	
 	output [12:0] LEDR,
 	
@@ -461,11 +545,24 @@ module datapath(
 	output [6:0] hex2,
 	output [6:0] hex4,
 	output [6:0] hex5,
-	output [6:0] hex6
+	output [6:0] hex6,
+	input wall
 	);
 	
 	reg [1:0]snake_dir;
 	reg [1:0]last_dir;
+	reg [7:0] apple_x_wall;
+	reg [7:0] apple_x_wall2;
+	reg [7:0] apple_x_wall3;
+	reg [7:0] apple_x_wall4;
+	reg [7:0] apple_x_wall5;
+	reg [6:0] apple_y_wall;
+	reg [6:0] apple_y_wall2;
+	reg [6:0] apple_y_wall3;
+	reg [6:0] apple_y_wall4;
+	reg [7:0] apple_y_wall5;
+	
+	
 	
 
 	localparam 	LEFT 	= 2'b00,
@@ -550,6 +647,20 @@ module datapath(
         case (current_state)
 			S_MAIN_MENU: begin
 			
+//					highscore_tracker highscores2(
+//						.curr_score(score),
+//						.curr_hi1(8'b0),
+//						.curr_hi2(8'b0),
+//						.curr_hi3(8'b0),
+//						.curr_hi4(8'b0),
+//						.curr_hi5(8'b0),
+//						.update(update),
+//						.hi1(hi1),
+//						.hi2(hi2),
+//						.hi3(hi3),
+//						.hi4(hi4),
+//						.hi5(hi5),
+//					);
 
 				snake_size = 8'd5;
 	
@@ -626,6 +737,38 @@ module datapath(
 				begin
 					apple_y[6:0] <= random_in[14:8] + 7'd2;
 				end
+				if(random_in2[7:0] >= 8'd150)
+					begin
+						// Make wall to the right
+						apple_x_wall[7:0] = apple_x[7:0] + 1;
+						apple_y_wall[6:0] = apple_y[6:0];
+					end
+				else if(random_in2[7:0] >= 8'd100)
+					begin
+						// Wall to the left
+						apple_x_wall[7:0] = apple_x[7:0] - 1;
+						apple_y_wall[6:0] = apple_y[6:0];
+					end
+				else if(random_in2[7:0] >= 8'd50)
+					begin
+						// Wall at the top
+						apple_x_wall[7:0] = apple_x[7:0];
+						apple_y_wall[6:0] = apple_y[6:0] + 1;
+					end
+				else
+					begin
+						// wall to the bottom
+						apple_x_wall[7:0] = apple_x[7:0];
+						apple_y_wall[6:0] = apple_y[6:0] - 1;
+					end
+				apple_x_wall2[7:0] = apple_x_wall[7:0] + 5;
+				apple_x_wall3[7:0] = apple_x_wall[7:0] + 5;
+				apple_x_wall4[7:0] = apple_x_wall[7:0] - 5;
+				apple_x_wall5[7:0] = apple_x_wall[7:0] - 5;
+				apple_y_wall2[6:0] = apple_y_wall[6:0] + 5;
+				apple_y_wall3[6:0] = apple_y_wall[6:0] - 5;
+				apple_y_wall4[6:0] = apple_y_wall[6:0] + 5;
+				apple_y_wall5[6:0] = apple_y_wall[6:0] - 5;
 			end
 			
 			S_CLR_SCREEN: begin
@@ -637,7 +780,7 @@ module datapath(
 				counter = counter + 1'b1;
 				end
 			S_DRAW_WALLS: begin
-				// set colour to blue
+				// set colour to red
 				colour = 3'b100;
 				// if the counter represents a value where the border wall should be drawn (right side stops at pixel 120)
 				if(counter[14:7] < 8'd2 || counter[14:7] > 8'd158 || counter[6:0] < 7'd2 || counter[6:0] > 7'd117)
@@ -645,6 +788,40 @@ module datapath(
 					draw_x = counter[14:7];
 					draw_y = counter[6:0];
 					end
+				else if (wall == 1'b1)
+					begin
+						if(counter[14:7] == apple_x_wall && counter[6:0] == apple_y_wall)
+						begin
+							colour = 3'b101;
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall2 && counter[6:0] == apple_y_wall2)
+						begin
+							colour = 3'b101;
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall3 && counter[6:0] == apple_y_wall3)
+						begin
+							colour = 3'b101;
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall4 && counter[6:0] == apple_y_wall4)
+						begin
+							colour = 3'b101;
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall5 && counter[6:0] == apple_y_wall5)
+						begin
+							colour = 3'b101;
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+					end
+				
 				counter = counter + 1'b1;
 				end
 
@@ -802,7 +979,34 @@ module datapath(
 				begin
 					// if the snake makes contact with the predetermined walls, there is a collision
 					if(snake_x[7:0] < 8'd2 || snake_x[7:0] > 8'd158 || snake_y[7:0] < 8'd2 || snake_y[7:0] > 8'd117)
+					begin
 						collision = 1'b1;
+					end
+					// If extra wall feature is enabled
+					if (wall == 1'b1)
+					begin
+						// Adding extra walls based on apples location
+						if(snake_x[7:0] == apple_x_wall && snake_y[7:0] == apple_y_wall)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall2 && snake_y[7:0] == apple_y_wall2)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall3 && snake_y[7:0] == apple_y_wall3)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall4 && snake_y[7:0] == apple_y_wall4)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall5 && snake_y[7:0] == apple_y_wall5)
+						begin
+							collision = 1'b1;
+						end
+					end
 				end
 
 				/**
