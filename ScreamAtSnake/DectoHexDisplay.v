@@ -44,6 +44,19 @@ module HEXDec(Input, Hex);
 	
 endmodule
 
+module HEXH(Hex);
+	output [6:0] Hex;
+	assign Hex[0] = 1'b1;
+	assign Hex[1] = 1'b0;
+	assign Hex[2] = 1'b0;
+	assign Hex[3] = 1'b1;
+	assign Hex[4] = 1'b0;
+	assign Hex[5] = 1'b0;
+	assign Hex[6] = 1'b0;
+	
+	
+endmodule
+
 	
 module HexSeg_0(c0, c1, c2, c3, m);
 	input c0, c1, c2, c3;
