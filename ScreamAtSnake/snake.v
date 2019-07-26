@@ -1,5 +1,4 @@
 module snake(
-// Hi
 	input [17:0] SW,
 	input [3:0] KEY,
 	input CLOCK_50,
