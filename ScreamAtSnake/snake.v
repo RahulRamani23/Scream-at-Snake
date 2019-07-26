@@ -148,8 +148,15 @@ module snake(
 		.prev_state(prev_state),
 		.sound_in(sound_out_wire)
 		);
+	
+	wire [24:0] t;
+	Timer timer(.clkin(CLOCK_50), .clkout(t),
+		.timereset(SW[13]));
 		
 	datapath d0(
+		.times(t),
+		.timer(SW[13]),
+		.close(SW[14]),
 		.clk(clk),
 		.direction(direction),
 		.grow(grow),
@@ -516,9 +523,46 @@ module control(
 	assign prev_state = previous_state;
 	
 endmodule
-	
+
+module Timer(input clkin, 
+				output reg [24:0] clkout,
+				input timereset);
+	reg [24:0] counter;
+	initial 
+	begin
+		 counter = 0;
+		 clkout = 0;
+	end
+
+	always @(posedge clkin) begin
+		if(timereset == 1'b0)
+		begin 
+			counter <= 0;
+			clkout <= 0;
+		end
+		else if (counter == 24999999) 
+		begin
+			counter <= 0;
+				if (clkout == 80) 
+				begin
+					clkout <= 0;
+				end 
+				else 
+				begin
+					clkout <= clkout + 1;
+				end
+		end 
+		else 
+		begin
+			counter <= counter + 1;
+		end
+	end
+endmodule	
 module datapath(
+	input [24:0] times,
 	input clk,
+	input timer,
+	input close,
 	input [1:0] direction,
 	input grow, dead,
 	input [4:0] current_state, prev_state,
@@ -770,6 +814,16 @@ module datapath(
 						apple_colour = apple_x[2:0]; // default red apple
 					else
 						apple_colour = 3'b100; // set to default colour instead of black
+					if(timer == 1'b1)
+						if(random_in[7:0] > (8'd150 - times - apple_colour)) 
+							apple_x[7:0] <= random_in[7:0] - 8'd110- times - 3 - apple_colour;
+						else if(random_in[7:0] <= (8'd3 + times + apple_colour))
+							apple_x[7:0] <= random_in[7:0] + 8'd3 + times + 3 + apple_colour;
+					if(close == 1'b1)
+						if(random_in[7:0] > (8'd150 - snake_size - apple_colour)) 
+							apple_x[7:0] <= random_in[7:0] - 8'd110- snake_size - 3 - apple_colour;
+						else if(random_in[7:0] <= (8'd3 + snake_size + apple_colour))
+							apple_x[7:0] <= random_in[7:0] + 8'd3 + snake_size + 3 + apple_colour;
 			
 				end
 				
@@ -782,6 +836,16 @@ module datapath(
 				begin
 					apple_y[6:0] <= random_in[14:8] + 7'd2;
 				end
+				if(timer == 1'b1 && close == 1'b0)
+					if(random_in[14:8] >= (7'd100- times - 7- apple_colour))
+						apple_y[6:0] <= random_in[14:8] + 7'd2 - 7'd100 - times  - apple_colour + 3;
+					else if(random_in[14:8] <= (7'd2 + times + apple_colour))
+						apple_y[6:0] <= random_in[14:8] + 7'd2 + times + apple_colour + 3;
+				if(close == 1'b1 && timer == 1'b0)
+					if(random_in[14:8] >= (7'd100- snake_size - apple_colour))
+						apple_y[6:0] <= random_in[14:8] + 7'd2 - 7'd100 - snake_size - apple_colour + 3;
+					else if(random_in[14:8] <= (7'd2 + snake_size + apple_colour))
+						apple_y[6:0] <= random_in[14:8] + 7'd2 + snake_size + 3 + apple_colour;
 				// Generating coordinates for the apple walls randomly
 				if(random_in2[7:0] >= 8'd150)
 					begin
@@ -1042,6 +1106,20 @@ module datapath(
 						draw_y = ghost_y;
 					end
 				end
+				if(timer == 1'b1 && close == 1'b0)
+				// if the counter represents a value where the border wall should be drawn (right side stops at pixel 120)
+					if(counter[14:7] < 8'd2+ times || counter[14:7] > 8'd158-times || counter[6:0] < 7'd2+times || counter[6:0] > 7'd117-times)
+						begin
+						draw_x = counter[14:7];
+						draw_y = counter[6:0] ;
+						end
+				if(timer == 1'b0 && close == 1'b1)
+				// if the counter represents a value where the border wall should be drawn (right side stops at pixel 120)
+					if(counter[14:7] < 8'd2+ snake_size || counter[14:7] > 8'd158-snake_size || counter[6:0] < 7'd2+snake_size || counter[6:0] > 7'd117-snake_size)
+						begin
+						draw_x = counter[14:7];
+						draw_y = counter[6:0] ;
+						end
 				counter = counter + 1'b1;
 				end
 			S_DRAW_APPLE: begin
@@ -1223,6 +1301,10 @@ module datapath(
 					begin
 						collision = 1'b1;
 					end
+					if(close == 1'b0 && timer == 1'b1 && (snake_x[7:0] < 8'd2+times || snake_x[7:0] > 8'd158-times || snake_y[7:0] < 8'd2+times || snake_y[7:0] > 8'd117-times))
+						collision = 1'b1;
+					if(timer == 1'b0 && close == 1'b1 && (snake_x[7:0] < 8'd2+snake_size || snake_x[7:0] > 8'd158-snake_size || snake_y[7:0] < 8'd2+snake_size || snake_y[7:0] > 8'd117-snake_size))
+						collision = 1'b1;
 					// If extra wall feature is enabled
 					if (wall == 2'b01)
 					// 5 dot wall
