@@ -182,8 +182,9 @@ module snake(
 		.hex4(HEX4),
 		.hex5(HEX5),
 		.hex6(HEX6),
-		.wall(SW[13:12]),
-		.maze(SW[11])
+		.wall(SW[12:11]),
+		.maze(SW[10]),
+		.ghost(SW[9])
 		);
 		
 		
@@ -548,11 +549,14 @@ module datapath(
 	output [6:0] hex5,
 	output [6:0] hex6,
 	input [2:0] wall,
-	input maze
+	input maze,
+	input ghost
 	);
 	
 	reg [1:0]snake_dir;
 	reg [1:0]last_dir;
+	
+	// Wall registers
 	reg [7:0] apple_x_wall;
 	reg [7:0] apple_x_wall2;
 	reg [7:0] apple_x_wall3;
@@ -564,8 +568,32 @@ module datapath(
 	reg [6:0] apple_y_wall4;
 	reg [7:0] apple_y_wall5;
 	
-	
-	
+	// Maze Registers
+	// Dimensions are 101 y values and 152 x values it seems
+	reg [6:0] block1_top = 7'd50;
+	reg [6:0] block1_bottom = 7'd20;
+	reg [7:0] block1_right = 8'd120;
+	reg [7:0] block1_left = 8'd0;
+	reg [6:0] block2_top = 7'd90;
+	reg [6:0] block2_bottom = 7'd65;
+	reg [7:0] block2_right = 8'd170;
+	reg [7:0] block2_left = 8'd30;
+	reg [6:0] block3_top = 7'd70;
+	reg [6:0] block3_bottom = 7'd50;
+	reg [7:0] block3_right = 8'd20;
+	reg [7:0] block3_left = 8'd20;
+	reg [7:0] maze_apple_x = 8'd152;
+	reg [6:0] maze_apple_y = 7'd101;
+	reg maze_complete = 1'b0;
+	// If adding more blocks, add it in collision and walls state
+	// Ghost registers
+	reg [7:0] ghost_x = 8'd0;
+	reg [6:0] ghost_y = 7'd0;
+	reg [2:0] ghost_path; // Calculates optimal ghost direction
+	reg [7:0] ghost_x_diff;
+	reg [6:0] ghost_y_diff;
+	reg ghost_right = 1'b0;
+	reg ghost_up = 1'b0;
 
 	localparam 	LEFT 	= 2'b00,
 					RIGHT = 2'b01,
@@ -697,6 +725,21 @@ module datapath(
 				snake_x[1023:40] = 0;
 				snake_y[1023:39] = 0;
 				
+				// If maze feature turned on, adjust snake position
+				if (maze == 1'b1)
+					begin
+						snake_x[7:0] = 8'd30;
+						snake_y[6:0] = 7'd5;
+						snake_x[15:8] = 8'd31;
+						snake_y[14:8] = 7'd5;
+						snake_x[23:16] = 8'd32;
+						snake_y[22:16] = 7'd5;
+						snake_x[31:24] = 8'd33;
+						snake_y[30:24] = 7'd5;
+						snake_x[39:32] = 8'd34;
+						snake_y[38:32] = 7'd5;
+					end
+				
 				// initializing snake colour and size
 				rainbow_order = 15'b100_110_010_011_101;
 				snake_colour[2:0] = rainbow_order[14:12];
@@ -767,6 +810,13 @@ module datapath(
 						// wall to the bottom
 						apple_x_wall[7:0] = apple_x[7:0];
 						apple_y_wall[6:0] = apple_y[6:0];
+					end
+				// Set apples somewhere else if maze
+				if (maze == 1'b1)
+					begin
+						// Putting apple on top right corner
+						apple_x[7:0] = maze_apple_x;
+						apple_y[6:0] = maze_apple_y;
 					end
 				apple_x_wall2[7:0] = apple_x_wall[7:0] + 5;
 				apple_x_wall3[7:0] = apple_x_wall[7:0] + 5;
@@ -884,6 +934,114 @@ module datapath(
 							draw_y = counter[6:0];
 						end
 					end
+				if (maze == 1'b1)
+					begin
+						// Draw maze feature
+						if((counter[14:7] <= block1_right && counter[14:7] >= block1_left) && (counter[6:0] <= block1_top && counter[6:0] >= block1_bottom))
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if((counter[14:7] <= block2_right && counter[14:7] >= block2_left) && (counter[6:0] <= block2_top && counter[6:0] >= block2_bottom))
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if((counter[14:7] <= block3_right && counter[14:7] >= block3_left) && (counter[6:0] <= block3_top && counter[6:0] >= block3_bottom))
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						
+					end
+				// Check if ghost feature is enabled
+				if (ghost == 1'b1)
+				begin
+					// Check which direction ghost is closest to the snake head
+					// Check if ghost should go right or left
+					if ((ghost_x - snake_x) <= 0)
+					begin
+						// Snake is to the right of ghost
+						ghost_x_diff = snake_x - ghost_x;
+						ghost_right = 1'b1; // Ghost should go right
+					end
+					else
+					begin
+						// Snake is to the left of ghost
+						ghost_x_diff = ghost_x - snake_x;
+						ghost_right = 1'b0;
+					end
+					// Check if ghost should go up or down
+					if ((ghost_y - snake_y) <= 0)
+					begin
+						// Snake is above ghost
+						ghost_y_diff = snake_x - ghost_x;
+						ghost_up = 1'b1;
+					end
+					else
+					begin
+						// Snake is below ghost
+						ghost_y_diff = ghost_x - snake_x;
+						ghost_up = 1'b0;
+					end
+					// Check if ghost should go x or y
+					if (ghost_x_diff >= ghost_y_diff)
+					begin
+						// Should change x coordinate
+						if (ghost_right == 1'b1)
+						begin
+							// Ghost should go right
+							ghost_path = 2'b00;
+						end
+						else
+						begin
+							// Ghost should go left
+							ghost_path = 2'b01;
+						end
+					end
+					else
+					begin
+						// Should change y coordinate
+						if (ghost_up == 1'b1)
+						begin
+							// Ghost should go up
+							ghost_path = 2'b10;
+						end
+						else
+						begin
+							// Ghost should go down
+							ghost_path = 2'b11;
+						end
+					end
+					// Now draw the ghost
+					if (ghost_path == 2'b00)
+					begin 
+						// Move right
+						ghost_x = ghost_x + 1;
+					end
+					else if (ghost_path == 2'b01)
+					begin 
+						// Move left
+						ghost_x = ghost_x - 1;
+					end
+					else if (ghost_path == 2'b10)
+					begin 
+						// Move up
+						ghost_y = ghost_y + 1;
+					end
+					else if (ghost_path == 2'b11)
+					begin 
+						// Move down
+						ghost_y = ghost_y - 1;
+					end
+					// Check if we can draw the ghost
+					if(counter[14:7] == ghost_x && counter[6:0] == ghost_y)
+					begin
+						// Draw the ghost
+						draw_x = ghost_x;
+						draw_y = ghost_y;
+					end
+				end
 				counter = counter + 1'b1;
 				end
 			S_DRAW_APPLE: begin
@@ -1117,6 +1275,39 @@ module datapath(
 							collision = 1'b1;
 						end
 					end
+					// Check if maze feature turned on
+					if (maze == 1'b1)
+						begin
+							// Check if touching maze blocks
+							if((snake_x[7:0] <= block1_right && snake_x[7:0] >= block1_left) && (snake_y[7:0] <= block1_top && snake_y[7:0] >= block1_bottom))
+							begin
+								collision = 1'b1;
+							end
+							else if((snake_x[7:0] <= block2_right && snake_x[7:0] >= block2_left) && (snake_y[7:0] <= block2_top && snake_y[7:0] >= block2_bottom))
+							begin
+								collision = 1'b1;
+							end
+							else if((snake_x[7:0] <= block3_right && snake_x[7:0] >= block3_left) && (snake_y[7:0] <= block3_top && snake_y[7:0] >= block3_bottom))
+							begin
+								collision = 1'b1;
+							end
+							// Check if touching maze apple being touched
+							if(snake_x[7:0] == maze_apple_x && snake_y[7:0] == maze_apple_y)
+							begin
+								// End the game and flag it so we know maze apple reached
+								collision = 1'b1;
+								maze_complete = 1'b1;
+							end
+						end
+					// Check if ghost feature enabled
+					if (ghost == 1'b1)
+						begin
+							// Check if head is colliding with ghost
+							if(snake_x[7:0] == ghost_x && snake_y[7:0] == ghost_y)
+							begin
+								collision = 1'b1;
+							end
+						end
 				end
 
 				/**
