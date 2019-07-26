@@ -1147,6 +1147,30 @@ module datapath(
 				else if (last_apple_colour[2:0] == 3'b101 )
 					snake_colour = snake_colour_101;
 					
+				if(last_apple_colour[2:0] == 3'b010 && snake_size > 5)
+					begin
+						if(poison_counter == 3'b100)
+								poison_counter = 0;
+						if(poison_counter == 0)
+						begin
+							// decrement snake size
+							snake_size = snake_size - 1;
+							if(toggle == 1)
+								begin
+									toggle = 0;
+									snake_colour = snake_colour_100;
+								end
+							else
+								begin
+									toggle = 1;
+									snake_colour = snake_colour_010;
+								end
+						end
+						poison_counter = poison_counter + 1;
+					end
+				else if (last_apple_colour[2:0] == 3'b010 )
+					snake_colour = snake_colour_010;
+					
 				if (last_apple_colour[2:0] != 3'b101)
 					p_counter = 2'd0;
 				end
