@@ -182,7 +182,8 @@ module snake(
 		.hex4(HEX4),
 		.hex5(HEX5),
 		.hex6(HEX6),
-		.wall(SW[15])
+		.wall(SW[13:12]),
+		.maze(SW[11])
 		);
 		
 		
@@ -546,7 +547,8 @@ module datapath(
 	output [6:0] hex4,
 	output [6:0] hex5,
 	output [6:0] hex6,
-	input wall
+	input [2:0] wall,
+	input maze
 	);
 	
 	reg [1:0]snake_dir;
@@ -737,16 +739,20 @@ module datapath(
 				begin
 					apple_y[6:0] <= random_in[14:8] + 7'd2;
 				end
+				// Generating coordinates for the apple walls randomly
 				if(random_in2[7:0] >= 8'd150)
 					begin
 						// Make wall to the right
 						apple_x_wall[7:0] = apple_x[7:0] + 1;
+						//apple_y_wall[6:0] = {1'b0, apple_y[6:0]};
 						apple_y_wall[6:0] = apple_y[6:0];
+						
 					end
 				else if(random_in2[7:0] >= 8'd100)
 					begin
 						// Wall to the left
 						apple_x_wall[7:0] = apple_x[7:0] - 1;
+						// apple_y_wall[6:0] = {1'b0, apple_y[6:0]};
 						apple_y_wall[6:0] = apple_y[6:0];
 					end
 				else if(random_in2[7:0] >= 8'd50)
@@ -754,12 +760,13 @@ module datapath(
 						// Wall at the top
 						apple_x_wall[7:0] = apple_x[7:0];
 						apple_y_wall[6:0] = apple_y[6:0] + 1;
+						// apple_y_wall[6:0] = {1'b0, apple_y[6:0] + 1};
 					end
 				else
 					begin
 						// wall to the bottom
 						apple_x_wall[7:0] = apple_x[7:0];
-						apple_y_wall[6:0] = apple_y[6:0] - 1;
+						apple_y_wall[6:0] = apple_y[6:0];
 					end
 				apple_x_wall2[7:0] = apple_x_wall[7:0] + 5;
 				apple_x_wall3[7:0] = apple_x_wall[7:0] + 5;
@@ -769,6 +776,7 @@ module datapath(
 				apple_y_wall3[6:0] = apple_y_wall[6:0] - 5;
 				apple_y_wall4[6:0] = apple_y_wall[6:0] + 5;
 				apple_y_wall5[6:0] = apple_y_wall[6:0] - 5;
+				
 			end
 			
 			S_CLR_SCREEN: begin
@@ -788,43 +796,96 @@ module datapath(
 					draw_x = counter[14:7];
 					draw_y = counter[6:0];
 					end
-				else if (wall == 1'b1)
+				// Checking if extra feature wall was added
+				if (wall == 2'b01)
+					// 5 dots wall
 					begin
 						if(counter[14:7] == apple_x_wall && counter[6:0] == apple_y_wall)
 						begin
-							colour = 3'b101;
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
 						else if(counter[14:7] == apple_x_wall2 && counter[6:0] == apple_y_wall2)
 						begin
-							colour = 3'b101;
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
 						else if(counter[14:7] == apple_x_wall3 && counter[6:0] == apple_y_wall3)
 						begin
-							colour = 3'b101;
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
 						else if(counter[14:7] == apple_x_wall4 && counter[6:0] == apple_y_wall4)
 						begin
-							colour = 3'b101;
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
 						else if(counter[14:7] == apple_x_wall5 && counter[6:0] == apple_y_wall5)
 						begin
-							colour = 3'b101;
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
 					end
-				
+				else if (wall == 2'b10)
+					// Y lines wall
+					begin
+						if(counter[14:7] == apple_x_wall && counter[6:0] == apple_y_wall)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall2 && counter[6:0] >= apple_y_wall2)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall3 && counter[6:0] <= apple_y_wall3)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall4 && counter[6:0] >= apple_y_wall4)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall5 && counter[6:0] <= apple_y_wall5)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+					end
+				else if (wall == 2'b11)
+					// X and Y lines wall
+					begin
+						if(counter[14:7] == apple_x_wall && counter[6:0] == apple_y_wall)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall2 && counter[6:0] >= apple_y_wall2)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] >= apple_x_wall3 && counter[6:0] == apple_y_wall3)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] <= apple_x_wall4 && counter[6:0] == apple_y_wall4)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+						else if(counter[14:7] == apple_x_wall5 && counter[6:0] <= apple_y_wall5)
+						begin
+							draw_x = counter[14:7];
+							draw_y = counter[6:0];
+						end
+					end
 				counter = counter + 1'b1;
 				end
-
 			S_DRAW_APPLE: begin
 				// set colour to red
 				colour = apple_colour[2:0];
@@ -852,8 +913,6 @@ module datapath(
 					last_dir <= direction;
 					snake_dir <= direction;
 				end
-				
-			
 				// not sure if these checks should be done only in moving state
 				// wondering if they'll register if you press the button at the wrong time
 				if (snake_dir == LEFT)
@@ -983,7 +1042,8 @@ module datapath(
 						collision = 1'b1;
 					end
 					// If extra wall feature is enabled
-					if (wall == 1'b1)
+					if (wall == 2'b01)
+					// 5 dot wall
 					begin
 						// Adding extra walls based on apples location
 						if(snake_x[7:0] == apple_x_wall && snake_y[7:0] == apple_y_wall)
@@ -1003,6 +1063,56 @@ module datapath(
 							collision = 1'b1;
 						end
 						else if(snake_x[7:0] == apple_x_wall5 && snake_y[7:0] == apple_y_wall5)
+						begin
+							collision = 1'b1;
+						end
+					end
+					else if (wall == 2'b10)
+					// Y line wall
+					begin
+						// Adding extra walls based on apples location
+						if(snake_x[7:0] == apple_x_wall && snake_y[7:0] == apple_y_wall)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall2 && snake_y[7:0] >= apple_y_wall2)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall3 && snake_y[7:0] <= apple_y_wall3)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall4 && snake_y[7:0] >= apple_y_wall4)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall5 && snake_y[7:0] <= apple_y_wall5)
+						begin
+							collision = 1'b1;
+						end
+					end
+					else if (wall == 2'b11)
+					// X and Y line wall
+					begin
+						// Adding extra walls based on apples location
+						if(snake_x[7:0] == apple_x_wall && snake_y[7:0] == apple_y_wall)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall2 && snake_y[7:0] >= apple_y_wall2)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] >= apple_x_wall3 && snake_y[7:0] == apple_y_wall3)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] <= apple_x_wall4 && snake_y[7:0] == apple_y_wall4)
+						begin
+							collision = 1'b1;
+						end
+						else if(snake_x[7:0] == apple_x_wall5 && snake_y[7:0] <= apple_y_wall5)
 						begin
 							collision = 1'b1;
 						end
