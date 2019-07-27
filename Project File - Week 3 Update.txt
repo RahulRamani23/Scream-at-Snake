@@ -1,0 +1,110 @@
+CSCB58 Project Report: Summer 2019
+
+Team Member A
+-------------
+First Name: Rahul
+Last Name: Ramani
+Student Number: 1004110758
+UofT E-mail Address: rahul.ramani@mail.utoronto.ca
+
+
+Team Member B
+-------------
+First Name: Prashyen
+Last Name: Kanagarajah
+Student Number: 1004107637
+UofT E-mail Address: prashyen.kanagarajah@mail.utoronto.ca
+
+Team Member C (Optional)
+-------------
+First Name: Justin
+Last Name: Lyn
+Student Number: 1004178301
+UofT E-mail Address: Justin.lyn@mail.utoronto.ca
+
+Team Member D (Optional)
+-------------
+First Name: Aamir
+Last Name: Haroon
+Student Number: 1004360648
+UofT E-mail Address: aamir.haroon@mail.utoronto.ca
+
+
+Project Plan
+--------
+
+Project Title: Scream at Snake
+
+
+Provide a one paragraph description of your project:
+We are creating a modified version of the classic video game snake. This video game will have three modes. We will have a classic mode
+which exists mainly for testing purposes, a two player mode where each player tries to grow their snake and take the other out, lastly
+we will have the name of the game scream at snake which is a mode in which you control the snake by making loud noises into a
+microphone.
+
+What is your plan for the first week?
+For the first week we plan on working on the initial design of the game determining all the components required, what sensors we will require in addition
+to what repositories we can use to help aid in creating the game.
+
+
+What is your plan for the second week?
+This week we plan on completing the implementation for the classic and two player modes and start working on the scream at snake mode
+
+
+What is your plan for the third week?
+We plan on completing the implementation for the scream at snake mode and using any time we have left for testing and debugging purposes
+
+
+What is your backup plan if things don't work out as planned?
+If things don't workout as planned we will try to implement snake on it's own with just the classic mode
+then prioritize the scream at snake mode above
+
+
+
+Weekly Reports
+--------------
+<In this space, provide a report each week of what worked and what didn't, and what (if any) changes were made to your proposal)>
+
+
+
+Week 1: 
+	We did reseach involving the idea for our project. The main goal of the first week was to determine what modules we would require and old repositories we would be able to use.
+	We disovered an existing repository that consisted of a completed snake game. Seeing this we modified the idea for our project a little. We were going to use large parts of the
+	existing code and build on top of that to create new game modes. We came up with various new additions, including Scream at snake, battle mode, race mode and different difficulty
+	settings. We planned out exactly how we plan on executing this idea and determined what modules we need. We started working on the module to detect sound input. We also started
+	stripping down the original code base and modifying to fit our needs.
+
+Week 2:
+	This week we got the sound sensor to work and so we implemented the ability for the user to control the snakes direction by screaming into the sensor.
+	We were also able to work out new difficulty levels for the game (The snakes speed increases with difficulty) and this can be controlled by the user using the switches which 
+	represent the different levels.
+	We are currently working on getting the HEX Display to display the users score rather than on screen updates so the game can utilize the entire display.
+	Moving forward we plan to implement new game modes such as a time trial mode where the user has a certain amount of time to collect a certain amount of apples (or as much as they can)
+	The other game modes will be added in as we finish the others and troubleshoot ongoing issues. 
+
+Week 3:
+	This week we completed the remaining game modes and made the modifications as listed below:
+
+		- Different game speeds fully implemented 
+		- Shrink Mode: Which shrinks the playing field by either the score (The higher the score the smaller the space) and by time (As time goes on the smaller the space)
+		- Maze Mode: Which forces the user to navigate a very narrow pathway to get to the end apple 
+		- Objects Mode: Will spawn additional blocks around the apple to make it more difficult 
+		- Objects + Mode: Will force the user to navigate through parallel and horizontal walls surrounding the apple in order to get it
+		- Added in new pop-up messages at the end of each game
+		- Added in a redesigned opening screen
+
+	Moving forward, before the presentation we need to run through a mock demo and make sure there are no errors with all the game modes and the game compiles without errors. 
+
+
+
+References
+----------
+<In this space clearly indicate all external sources used in this project. If you used anyone else's code (from previous B58 projects or other sources) clearly indicate what you used and where you found it. Usage of any material not credited in this space will be considered plagiarism. It is absolutely OK and expected to update this section as you progress in the projected.
+
+Make sure to document what you added on top of the existing work, especially if you work with a previous project. What is it that YOU added?>
+
+
+
+Repo & Video
+------------
+<At the end of the project, provide links to your code repository and presentation video (and passwords if not public), if you don't want us to publish this info on future course websites, just say so here>
