@@ -190,8 +190,8 @@ module snake(
 		.hex5(HEX5),
 		.hex6(HEX6),
 		.wall(SW[12:11]),
-		.maze(SW[10]),
-		.ghost(SW[9])
+		.maze(SW[10])
+		//.ghost(SW[9])
 		);
 		
 		
@@ -593,8 +593,8 @@ module datapath(
 	output [6:0] hex5,
 	output [6:0] hex6,
 	input [2:0] wall,
-	input maze,
-	input ghost
+	input maze
+	//input ghost
 	);
 	
 	reg [1:0]snake_dir;
@@ -614,22 +614,27 @@ module datapath(
 	
 	// Maze Registers
 	// Dimensions are 101 y values and 152 x values it seems
+	// Top right corner is x=0 and y=0. So top and bottom are
+	// actually flipped
 	reg [6:0] block1_top = 7'd50;
 	reg [6:0] block1_bottom = 7'd20;
-	reg [7:0] block1_right = 8'd120;
+	reg [7:0] block1_right = 8'd145;
 	reg [7:0] block1_left = 8'd0;
-	reg [6:0] block2_top = 7'd90;
-	reg [6:0] block2_bottom = 7'd65;
+	reg [6:0] block2_top = 7'd115;
+	reg [6:0] block2_bottom = 7'd55;
 	reg [7:0] block2_right = 8'd170;
-	reg [7:0] block2_left = 8'd30;
+	reg [7:0] block2_left = 8'd3;
+	/*
 	reg [6:0] block3_top = 7'd70;
 	reg [6:0] block3_bottom = 7'd50;
 	reg [7:0] block3_right = 8'd20;
 	reg [7:0] block3_left = 8'd20;
+	*/
 	reg [7:0] maze_apple_x = 8'd152;
-	reg [6:0] maze_apple_y = 7'd101;
+	reg [6:0] maze_apple_y = 7'd117;
 	reg maze_complete = 1'b0;
 	// If adding more blocks, add it in collision and walls state
+	/*
 	// Ghost registers
 	reg [7:0] ghost_x = 8'd0;
 	reg [6:0] ghost_y = 7'd0;
@@ -638,7 +643,7 @@ module datapath(
 	reg [6:0] ghost_y_diff;
 	reg ghost_right = 1'b0;
 	reg ghost_up = 1'b0;
-
+	*/
 	localparam 	LEFT 	= 2'b00,
 					RIGHT = 2'b01,
 					DOWN 	= 2'b10,
@@ -782,6 +787,7 @@ module datapath(
 						snake_y[30:24] = 7'd5;
 						snake_x[39:32] = 8'd34;
 						snake_y[38:32] = 7'd5;
+						maze_complete = 1'b0;
 					end
 				
 				// initializing snake colour and size
@@ -875,6 +881,11 @@ module datapath(
 						apple_x_wall[7:0] = apple_x[7:0];
 						apple_y_wall[6:0] = apple_y[6:0];
 					end
+				// Check if the walls are too high (Should fix bug)
+				if(apple_y_wall[6:0] <= 8'd0)
+					begin
+						apple_y_wall[6:0] = apple_y_wall - 2;
+					end
 				// Set apples somewhere else if maze
 				if (maze == 1'b1)
 					begin
@@ -882,6 +893,7 @@ module datapath(
 						apple_x[7:0] = maze_apple_x;
 						apple_y[6:0] = maze_apple_y;
 					end
+					
 				apple_x_wall2[7:0] = apple_x_wall[7:0] + 5;
 				apple_x_wall3[7:0] = apple_x_wall[7:0] + 5;
 				apple_x_wall4[7:0] = apple_x_wall[7:0] - 5;
@@ -1011,14 +1023,16 @@ module datapath(
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
+						/*
 						else if((counter[14:7] <= block3_right && counter[14:7] >= block3_left) && (counter[6:0] <= block3_top && counter[6:0] >= block3_bottom))
 						begin
 							draw_x = counter[14:7];
 							draw_y = counter[6:0];
 						end
-						
+						*/
 					end
-				// Check if ghost feature is enabled
+				/*
+				// Check if ghost feature is enabled (Couldn't get it working in time)
 				if (ghost == 1'b1)
 				begin
 					// Check which direction ghost is closest to the snake head
@@ -1106,6 +1120,7 @@ module datapath(
 						draw_y = ghost_y;
 					end
 				end
+				*/
 				if(timer == 1'b1 && close == 1'b0)
 				// if the counter represents a value where the border wall should be drawn (right side stops at pixel 120)
 					if(counter[14:7] < 8'd2+ times || counter[14:7] > 8'd158-times || counter[6:0] < 7'd2+times || counter[6:0] > 7'd117-times)
@@ -1393,10 +1408,12 @@ module datapath(
 							begin
 								collision = 1'b1;
 							end
+							/*
 							else if((snake_x[7:0] <= block3_right && snake_x[7:0] >= block3_left) && (snake_y[7:0] <= block3_top && snake_y[7:0] >= block3_bottom))
 							begin
 								collision = 1'b1;
 							end
+							*/
 							// Check if touching maze apple being touched
 							if(snake_x[7:0] == maze_apple_x && snake_y[7:0] == maze_apple_y)
 							begin
@@ -1405,6 +1422,7 @@ module datapath(
 								maze_complete = 1'b1;
 							end
 						end
+						/*
 					// Check if ghost feature enabled
 					if (ghost == 1'b1)
 						begin
@@ -1414,6 +1432,7 @@ module datapath(
 								collision = 1'b1;
 							end
 						end
+					*/
 				end
 
 				/**
