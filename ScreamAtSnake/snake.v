@@ -1490,8 +1490,8 @@ module datapath(
 				end
 				// information for drawing
 				width = 100;
-				x_offset = 0;
-				y_offset = 0;
+				x_offset = 25;
+				y_offset = 10;
 				
 				// draw the current information at the calculated position in yellow
 				colour = 3'b110;
@@ -1625,7 +1625,7 @@ module datapath(
 	game_overlay overlay_0(
 		.OUT(endgame_grid),
 		.is_high_score(got_high),
-		.is_win(1'b0),
+		.is_win(maze_complete),
 		.clock(clk)
 		);
 	
