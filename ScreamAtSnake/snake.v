@@ -84,7 +84,7 @@ module snake(
 	wire [14:0] random_out;
 	wire [14:0] random_out2;
 	
-	//output signal for sound module
+	// added output signal for sound module
 	wire [0:0] sound_out_wire;
 	Sound_Module SM(.sound(GPIO[0]), .out(sound_out_wire), .enable(SW[1]));
 
@@ -368,6 +368,8 @@ module control(
 	assign COLLISION_MAX = snake_size + 1; // currently checking all snake blocks + 1 check for predetermined walls, this size can be expanded to check for other collisions in the future
 	assign DRAW_END_MAX = 2500;
 	reg [27:0] speed;
+	
+	// defining a new look-up table to change number of ticks thus making the game move faster or slower to change game difficuly
 	always @ (*)
 	begin
 		case(diff)
@@ -485,8 +487,7 @@ module control(
 				plot = 1'b1;
 				end
 			S_MOVING: begin
-				// not sure if these checks should be done only in moving state
-				// wondering if they'll register if you press the button at the wrong time
+				// Adding functionality to check if sound is being input for non-complacent snake
 				if ((mv_left && sound_in)  && direction != RIGHT)
 					direction = LEFT;
 				else if ((mv_right && sound_in) && direction != LEFT)
@@ -1213,7 +1214,7 @@ module datapath(
 					rainbow_order[14:12] = snake_colour[2:0];
 					end
 					
-				// if the last apple eaten was purple we have steroid mode
+				// Defining purple apple to be the new steroid apple
 				if(last_apple_colour[2:0] == 3'b101 && p_counter < 4'b1111)
 					begin
 						if(poison_counter == 3'b100)
@@ -1240,6 +1241,7 @@ module datapath(
 				else if (last_apple_colour[2:0] == 3'b101 )
 					snake_colour = snake_colour_101;
 					
+				// changed poison apple to green apple
 				if(last_apple_colour[2:0] == 3'b010 && snake_size > 5)
 					begin
 						if(poison_counter == 3'b100)
