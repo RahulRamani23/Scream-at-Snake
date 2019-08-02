@@ -121,4 +121,4 @@ The repository is available at: https://github.com/gordielsky/snake
 Repo & Video
 ------------
 Repository: https://github.com/RahulRamani23/Scream-at-Snake
-Video:
+Video: https://www.youtube.com/watch?v=IFtSx25tHuM&feature=youtu.be
