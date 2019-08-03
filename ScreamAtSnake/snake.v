@@ -148,7 +148,7 @@ module snake(
 		.prev_state(prev_state),
 		.sound_in(sound_out_wire)
 		);
-	
+	//60sec timer for time trial snake mode
 	wire [24:0] t;
 	Timer timer(.clkin(CLOCK_50), .clkout(t),
 		.timereset(SW[13]));
@@ -821,12 +821,12 @@ module datapath(
 						apple_colour = apple_x[2:0]; // default red apple
 					else
 						apple_colour = 3'b100; // set to default colour instead of black
-					if(timer == 1'b1)
+					if(timer == 1'b1)// time trial mode enabled, adjust apple position to fit within walls
 						if(random_in[7:0] > (8'd150 - times - apple_colour)) 
 							apple_x[7:0] <= random_in[7:0] - 8'd110- times - 3 - apple_colour;
 						else if(random_in[7:0] <= (8'd3 + times + apple_colour))
 							apple_x[7:0] <= random_in[7:0] + 8'd3 + times + 3 + apple_colour;
-					if(close == 1'b1)
+					if(close == 1'b1)// score trial mode enabled, adjust apple position to fit within walls
 						if(random_in[7:0] > (8'd150 - snake_size - apple_colour)) 
 							apple_x[7:0] <= random_in[7:0] - 8'd110- snake_size - 3 - apple_colour;
 						else if(random_in[7:0] <= (8'd3 + snake_size + apple_colour))
@@ -843,12 +843,12 @@ module datapath(
 				begin
 					apple_y[6:0] <= random_in[14:8] + 7'd2;
 				end
-				if(timer == 1'b1 && close == 1'b0)
+				if(timer == 1'b1 && close == 1'b0)// time trial mode enabled, adjust apple position to fit within walls
 					if(random_in[14:8] >= (7'd100- times - 7- apple_colour))
 						apple_y[6:0] <= random_in[14:8] + 7'd2 - 7'd100 - times  - apple_colour + 3;
 					else if(random_in[14:8] <= (7'd2 + times + apple_colour))
 						apple_y[6:0] <= random_in[14:8] + 7'd2 + times + apple_colour + 3;
-				if(close == 1'b1 && timer == 1'b0)
+				if(close == 1'b1 && timer == 1'b0)// score trial mode enabled, adjust apple position to fit within walls
 					if(random_in[14:8] >= (7'd100- snake_size - apple_colour))
 						apple_y[6:0] <= random_in[14:8] + 7'd2 - 7'd100 - snake_size - apple_colour + 3;
 					else if(random_in[14:8] <= (7'd2 + snake_size + apple_colour))
@@ -1318,8 +1318,10 @@ module datapath(
 					begin
 						collision = 1'b1;
 					end
+					//adjust collision postion based on time trial closing walls
 					if(close == 1'b0 && timer == 1'b1 && (snake_x[7:0] < 8'd2+times || snake_x[7:0] > 8'd158-times || snake_y[7:0] < 8'd2+times || snake_y[7:0] > 8'd117-times))
 						collision = 1'b1;
+					//adjust collision position based on score trial closing walls
 					if(timer == 1'b0 && close == 1'b1 && (snake_x[7:0] < 8'd2+snake_size || snake_x[7:0] > 8'd158-snake_size || snake_y[7:0] < 8'd2+snake_size || snake_y[7:0] > 8'd117-snake_size))
 						collision = 1'b1;
 					// If extra wall feature is enabled
